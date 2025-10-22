@@ -17,9 +17,25 @@ namespace TodoApp.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Todo>>> GetTodos()
+        public async Task<ActionResult<IEnumerable<Todo>>> GetTodos(
+            [FromQuery] string? query,
+            [FromQuery] bool? completed)
         {
-            return await _context.Todos.ToListAsync();
+            var todos = _context.Todos.AsQueryable();
+
+            // Filter by search term
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                todos = todos.Where(t => t.Title != null && t.Title.ToLower().Contains(query.ToLower()));
+            }
+
+            // Filter by completion status
+            if (completed.HasValue)
+            {
+                todos = todos.Where(t => t.Completed == completed.Value);
+            }
+
+            return await todos.ToListAsync();
         }
 
         [HttpGet("{id}")]

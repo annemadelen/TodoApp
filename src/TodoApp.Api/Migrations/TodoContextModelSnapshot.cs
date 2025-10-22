@@ -22,7 +22,7 @@ namespace TodoApp.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsCompleted")
+                    b.Property<bool>("Completed")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Title")
