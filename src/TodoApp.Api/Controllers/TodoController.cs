@@ -39,7 +39,7 @@ namespace TodoApp.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Todo>> GetTodoById(int id)
+        public async Task<ActionResult<Todo>> GetTodoById(string id)
         {
             var todo = await _context.Todos.FindAsync(id);
             if (todo == null)
@@ -50,24 +50,38 @@ namespace TodoApp.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Todo>> CreateTodo(Todo todo)
         {
+            // Validation: Title cannot be empty
+            if (string.IsNullOrWhiteSpace(todo.Title))
+                return BadRequest("Title cannot be empty.");
+
+            // Generate UUID and timestamps
+            todo.Id = Guid.NewGuid().ToString();
+            todo.CreatedAt = DateTime.UtcNow;
+            todo.UpdatedAt = null; 
+
             _context.Todos.Add(todo);
             await _context.SaveChangesAsync();
+
             return CreatedAtAction(nameof(GetTodoById), new { id = todo.Id }, todo);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTodo(int id, Todo todo)
+        public async Task<IActionResult> UpdateTodo(string id, Todo updatedTodo)
         {
-            if (id != todo.Id)
-                return BadRequest();
+            var todo = await _context.Todos.FindAsync(id);
+            if (todo == null)
+                return NotFound();
 
-            _context.Entry(todo).State = EntityState.Modified;
+            todo.Title = updatedTodo.Title ?? todo.Title;
+            todo.Completed = updatedTodo.Completed;
+            todo.UpdatedAt = DateTime.UtcNow;
+
             await _context.SaveChangesAsync();
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTodo(int id)
+        public async Task<IActionResult> DeleteTodo(string id)
         {
             var todo = await _context.Todos.FindAsync(id);
             if (todo == null)

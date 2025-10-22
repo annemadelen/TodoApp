@@ -39,23 +39,48 @@ function App() {
 
   // Add a new todo
   const addTodo = async () => {
-    if (!newTodo.trim()) return;
+    const title = newTodo.trim();
+    if (!title) {
+      alert("Title cannot be empty.");
+      return;
+    }
 
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: newTodo, isComplete: false }),
+      body: JSON.stringify({ title }),
     });
 
-    const data = await response.json();
-    setTodos([...todos, data]);
-    setNewTodo("");
+    if (response.ok) {
+      const data = await response.json();
+      setTodos([...todos, data]);
+      setNewTodo("");
+    } else {
+      alert("Failed to add todo.");
+    }
   };
 
   // Delete a todo
   const deleteTodo = async (id) => {
     await fetch(`${API_URL}/${id}`, { method: "DELETE" });
     setTodos(todos.filter(t => t.id !== id));
+  };
+
+  // Toggle completion
+  const toggleCompleted = async (todo) => {
+    const updatedTodo = { ...todo, completed: !todo.completed};
+
+    const response = await fetch(`${API_URL}/${todo.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedTodo),
+    });
+
+    if (response.ok) {
+      fetchTodos();
+    } else {
+      alert("Error updating todo.");
+    }
   };
 
   return (
@@ -70,7 +95,9 @@ function App() {
           onChange={(e) => setNewTodo(e.target.value)}
           placeholder="Add a task..."
         />
-        <button onClick={addTodo}>Add</button>
+        <button onClick={addTodo} style={{ marginLeft: "0.5rem" }}>
+          Add
+        </button>
       </div>
 
       {/* Search + Filter */}
@@ -93,10 +120,39 @@ function App() {
       </div>
 
       {/* Todo List */}
-      <ul>
-        {todos.map(todo => (
-          <li key={todo.id}>
-            {todo.title} {todo.completed ? "✅" : ""}
+      <ul style={{ listStyle: "none", padding: 0 }}>
+        {todos.map((todo) => (
+          <li
+            key={todo.id}
+            style={{
+              marginBottom: "0.75rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <div>
+              <input
+                type="checkbox"
+                checked={todo.completed}
+                onChange={() => toggleCompleted(todo)}
+              />
+              <span
+                style={{
+                  textDecoration: todo.completed ? "line-through" : "none",
+                  marginLeft: "0.5rem",
+                }}
+              >
+                {todo.title}
+              </span>
+              {/* Show created/updated times */}
+              <div style={{ fontSize: "0.8rem", color: "gray" }}>
+                Created: {new Date(todo.createdAt).toLocaleString()}
+                {todo.updatedAt && (
+                  <> | Updated: {new Date(todo.updatedAt).toLocaleString()}</>
+                )}
+              </div>
+            </div>
             <button
               onClick={() => deleteTodo(todo.id)}
               style={{ marginLeft: "1rem" }}
