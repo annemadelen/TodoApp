@@ -1,38 +1,42 @@
 import React, { useEffect, useState } from "react";
+import './App.css';
 
+// Base URL for backend API
 const API_URL = "http://localhost:5112/api/todo";
 
 function App() {
-  const [todos, setTodos] = useState([]);
-  const [newTodo, setNewTodo] = useState("");
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("all");
+  const [todos, setTodos] = useState([]);         // List of todo items
+  const [newTodo, setNewTodo] = useState("");     // Text input for a new task
+  const [search, setSearch] = useState("");       // Search query
+  const [filter, setFilter] = useState("all");    // Filter: "all", "completed", or "incomplete"
 
-  // Fetch todos
+  // Fetch todos from backend API
   const fetchTodos = async () => {
     let url = `${API_URL}?`;
     const params = [];
 
+    // Add query params for seach and filters
     if (search.trim()) {
       params.push(`query=${encodeURIComponent(search)}`);
     }
     if (filter === "completed") {
       params.push("completed=true");
-    } else if (filter === "incompleted") {
+    } else if (filter === "incomplete") {
       params.push("completed=false");
     }
 
     url += params.join("&")
 
     try {
-      const res = await fetch(url);
-      const data = await res.json();
-      setTodos(data);
+      const res = await fetch(url);     // Send GET request
+      const data = await res.json();    // Convert response to JSON
+      setTodos(data);                   // Store todos in React state
     } catch (err) {
       console.error("Error fetching todos:", err)
     }
   }
 
+  // Fecth todos when "search" or "filter" changes
   useEffect(() => {
     fetchTodos();
   }, [search, filter]);
@@ -51,6 +55,7 @@ function App() {
       body: JSON.stringify({ title }),
     });
 
+    // if successful, add new todo to the state
     if (response.ok) {
       const data = await response.json();
       setTodos([...todos, data]);
@@ -60,10 +65,10 @@ function App() {
     }
   };
 
-  // Delete a todo
+  // Delete a todo by id
   const deleteTodo = async (id) => {
     await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-    setTodos(todos.filter(t => t.id !== id));
+    setTodos(todos.filter(t => t.id !== id)); // Remove from state
   };
 
   // Toggle completion
@@ -77,7 +82,7 @@ function App() {
     });
 
     if (response.ok) {
-      fetchTodos();
+      fetchTodos(); // Refresh list
     } else {
       alert("Error updating todo.");
     }

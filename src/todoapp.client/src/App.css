@@ -1,38 +1,88 @@
+
+
+/* 1. Global / Body Styling */
 .App {
-  text-align: center;
+    /* sans-serif font */
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f8f8; /* background */
+    min-height: 100vh;
+    padding: 20px;
+    color: #333; /* Standard dark text */
+    /* Center the main content area */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* 2. Main Title */
+h1 {
+    font-size: 2.2rem;
+    color: #a85873; /* dusty rose/lavender */
+    margin-bottom: 25px;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+    max-width: 500px; 
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* 3. Input and Select Elements */
+input[type="text"], select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px; /* Soft rounding */
+    margin-right: 8px; /* Spacing between input and button */
+    font-size: 1rem;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05); /* shadow */
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+/* 4. Button Styling (Applies to Add and all Remove buttons) */
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    
+    /* Using the accent color for all buttons for simplicity */
+    background-color: #f7cac9; /* coral/pink accent */
+    color: #333; /* Dark text for contrast */
+    transition: background-color 0.2s;
 }
 
-.App-link {
-  color: #61dafb;
+button:hover {
+    background-color: #e6a7a5; /* Slightly darker on hover */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* 5. Task List Items */
+.App > div:nth-of-type(n+3) { 
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Align to the top of the text */
+    padding: 12px 0;
+    border-bottom: 1px solid #eee; /* Light separator line */
+    width: 100%;
+    max-width: 500px;
+    text-align: left;
+}
+
+input[type="checkbox"] {
+    margin-right: 15px;
+    /* Use a standard accent color for the checkmark */
+    accent-color: #a46d97; 
+    transform: scale(1.1); /* Make it slightly more visible */
+}
+
+/* Style for the 'Created'/'Updated' */
+.App > div:nth-of-type(n+3) > span { 
+    display: block;
+    font-size: 0.75rem;
+    color: #777;
+    margin-top: 2px;
+}
+
+/* Style for completed tasks */
+input[type="checkbox"]:checked + * {
+    text-decoration: line-through;
+    color: #999;
 }
